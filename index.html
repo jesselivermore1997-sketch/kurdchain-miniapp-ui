@@ -2,65 +2,120 @@
 <html lang="ku" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KurdChain VIP Prices</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KurdChain App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            background-color: var(--tg-theme-bg-color, #1f2937);
-            color: var(--tg-theme-text-color, #ffffff);
-            font-family: 'Kurdish', sans-serif;
+            background-color: #000000; /* ڕەنگی ڕەشی ئای ئۆ ئێس */
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
-        .card {
-            background-color: var(--tg-theme-secondary-bg-color, #374151);
+        .header-bg {
+            background-color: #1c1c1e;
+            border-bottom: 1px solid #2c2c2e;
         }
+        .tab-btn {
+            color: #8e8e93;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .tab-btn.active {
+            color: #0a84ff; /* شینی ئای ئۆ ئێس */
+            border-bottom: 2px solid #0a84ff;
+        }
+        .list-container {
+            background-color: #1c1c1e;
+            border-radius: 12px;
+            margin: 16px;
+            overflow: hidden;
+        }
+        .list-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #2c2c2e;
+        }
+        .list-item:last-child {
+            border-bottom: none;
+        }
+        .icon-box {
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #2c2c2e;
+            border-radius: 50%;
+            margin-left: 12px;
+        }
+        .price-col {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            min-width: 80px;
+        }
+        .price-val {
+            font-weight: 600;
+            font-size: 15px;
+            direction: ltr;
+        }
+        .price-label {
+            font-size: 11px;
+            color: #8e8e93;
+            margin-bottom: 2px;
+        }
+        .sell-color { color: #ff453a; } /* سووری کڕین/فرۆشتن */
+        .buy-color { color: #32d74b; } /* سەوزی کڕین/فرۆشتن */
     </style>
 </head>
-<body class="p-4">
+<body>
 
-    <!-- بەشی پیشاندانی لۆدینگ -->
-    <div id="loading" class="text-center mt-20">
-        <h2 class="text-xl font-bold">چاوەڕێ بکە...</h2>
-        <p class="text-sm mt-2 text-gray-400">خەریکی سەلماندنی هەژمارەکەتین</p>
+    <!-- لۆدینگ -->
+    <div id="loading" class="flex h-screen items-center justify-center">
+        <div class="text-center">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0a84ff] mx-auto mb-3"></div>
+            <p class="text-sm text-gray-400">نوێکردنەوەی نرخەکان...</p>
+        </div>
     </div>
 
-    <!-- بەشی ڕەتکردنەوە (ئەگەر کەسەکە VIP نەبوو) -->
-    <div id="access-denied" class="hidden text-center mt-20">
-        <h2 class="text-2xl font-bold text-red-500">ببوورە!</h2>
-        <p class="mt-4 text-lg">ئەم خزمەتگوزارییە تەنها بۆ ئەندامانی کەناڵی تایبەتی KurdChain ـە.</p>
-        <button onclick="tg.close()" class="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
-            داخستن
-        </button>
-    </div>
-
-    <!-- بەشی داشبۆردی نرخەکان (ئەگەر VIP بوو) -->
-    <div id="dashboard" class="hidden">
-        <h1 class="text-2xl font-bold mb-6 text-center text-yellow-400">نرخەکانی بازاڕی سلێمانی</h1>
-        
-        <div class="grid grid-cols-2 gap-4">
-            <div class="card p-4 rounded-lg text-center shadow-lg border border-gray-600">
-                <p class="text-sm text-gray-300 mb-1">١٠٠ دۆلار</p>
-                <p class="text-xl font-bold text-green-400" id="price-usd">---</p>
-            </div>
-            
-            <div class="card p-4 rounded-lg text-center shadow-lg border border-gray-600">
-                <p class="text-sm text-gray-300 mb-1">١٠٠ دۆلار بە تمەن</p>
-                <p class="text-xl font-bold text-blue-400" id="price-toman">---</p>
+    <!-- داشبۆرد -->
+    <div id="dashboard" class="hidden pb-10">
+        <!-- هێدەر -->
+        <div class="header-bg sticky top-0 z-10">
+            <div class="flex justify-between items-center px-4 py-3">
+                <div>
+                    <h1 class="text-xl font-bold">KurdChain</h1>
+                    <p class="text-xs text-[#32d74b] flex items-center gap-1">
+                        <span class="relative flex h-2 w-2">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#32d74b] opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-2 w-2 bg-[#32d74b]"></span>
+                        </span>
+                        نرخەکان ڕاستەوخۆن
+                    </p>
+                </div>
+                <div class="text-sm text-gray-400" id="clock">--:--</div>
             </div>
 
-            <div class="card p-4 rounded-lg text-center shadow-lg border border-gray-600">
-                <p class="text-sm text-gray-300 mb-1">زێڕ عەیارە ٢١</p>
-                <p class="text-xl font-bold text-yellow-400" id="price-gold">---</p>
-            </div>
-
-            <div class="card p-4 rounded-lg text-center shadow-lg border border-gray-600">
-                <p class="text-sm text-gray-300 mb-1">١٠٠ یۆرۆ</p>
-                <p class="text-xl font-bold text-white" id="price-euro">---</p>
+            <!-- تابەکان -->
+            <div class="flex px-4 mt-2">
+                <button onclick="switchTab('currencies')" id="tab-currencies" class="tab-btn active flex-1 pb-2 text-sm font-medium">دراوەکان</button>
+                <button onclick="switchTab('metals')" id="tab-metals" class="tab-btn flex-1 pb-2 text-sm font-medium">زێڕ و زیو</button>
+                <button onclick="switchTab('crypto')" id="tab-crypto" class="tab-btn flex-1 pb-2 text-sm font-medium">دیجیتاڵی</button>
             </div>
         </div>
+
+        <!-- لیستی دراوەکان -->
+        <div id="content-currencies" class="list-container"></div>
         
-        <p class="text-center text-xs text-gray-400 mt-8">ئەم نرخانە بە شێوەی ڕاستەوخۆ نوێ دەکرێنەوە</p>
+        <!-- لیستی زێڕ -->
+        <div id="content-metals" class="list-container hidden"></div>
+
+        <!-- لیستی کریپتۆ -->
+        <div id="content-crypto" class="list-container hidden"></div>
     </div>
 
     <script>
@@ -68,55 +123,91 @@
         tg.expand();
         tg.ready();
 
-        const user = tg.initDataUnsafe?.user;
         const apiUrl = "https://kurdchain-miniapp-api-production.up.railway.app";
+        let currentData = {};
 
-        async function checkAccessAndLoadData() {
-            if (!user) {
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('access-denied').classList.remove('hidden');
-                return;
-            }
+        // کاتژمێری سەرەوە
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+        }, 1000);
 
-            try {
-                const verifyResponse = await fetch(`${apiUrl}/api/verify/${user.id}`);
-                
-                if (!verifyResponse.ok) {
-                    throw new Error(`Server status: ${verifyResponse.status}`);
-                }
+        // گۆڕینی تابەکان
+        window.switchTab = function(tabName) {
+            ['currencies', 'metals', 'crypto'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.remove('active');
+                document.getElementById(`content-${t}`).classList.add('hidden');
+            });
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            document.getElementById(`content-${tabName}`).classList.remove('hidden');
+        };
 
-                const verifyData = await verifyResponse.json();
-                document.getElementById('loading').classList.add('hidden');
-
-                if (verifyData.is_vip) {
-                    document.getElementById('dashboard').classList.remove('hidden');
-                    fetchPrices();
-                    setInterval(fetchPrices, 10000); 
-                } else {
-                    document.getElementById('access-denied').classList.remove('hidden');
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                document.getElementById('loading').innerHTML = `<div class='mt-10'><h2 class='text-xl font-bold text-red-500'>کێشەیەک ڕوویدا</h2><p class='mt-4 text-gray-300' dir='ltr'>${error.message}</p></div>`;
-            }
+        // دروستکردنی کۆدی HTML بۆ هەر ڕیزێک
+        function generateListHTML(items) {
+            if (!items) return '';
+            return items.map(item => `
+                <div class="list-item">
+                    <div class="icon-box">${item.icon}</div>
+                    <div class="flex-1 mr-3">
+                        <div class="font-semibold text-[15px]">${item.name}</div>
+                        <div class="text-xs text-[#8e8e93]">${item.desc}</div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="price-col">
+                            <span class="price-label">کڕین</span>
+                            <span class="price-val buy-color">${item.buy}</span>
+                        </div>
+                        <div class="price-col">
+                            <span class="price-label">فرۆشتن</span>
+                            <span class="price-val sell-color">${item.sell}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         }
 
         async function fetchPrices() {
             try {
+                // کاتی تاقیکردنەوە، دەتوانین ڕاستەوخۆ داتاکە بهێنین بێ سەلماندن ئەگەر بتەوێت زوو بیبینیت
                 const res = await fetch(`${apiUrl}/api/prices`);
                 if (!res.ok) return;
-                const data = await res.json();
                 
-                document.getElementById('price-usd').innerText = data.usd_iqd.toLocaleString() + " دینار";
-                document.getElementById('price-toman').innerText = data.toman.toLocaleString() + " تمەن";
-                document.getElementById('price-gold').innerText = data.gold_21_mithqal.toLocaleString() + " دینار";
-                document.getElementById('price-euro').innerText = data.euro.toLocaleString() + " دینار";
+                currentData = await res.json();
+                
+                document.getElementById('content-currencies').innerHTML = generateListHTML(currentData.currencies);
+                document.getElementById('content-metals').innerHTML = generateListHTML(currentData.metals);
+                document.getElementById('content-crypto').innerHTML = generateListHTML(currentData.crypto);
+
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+
             } catch (error) {
                 console.error("Failed to fetch prices:", error);
             }
         }
 
-        checkAccessAndLoadData();
+        // پشکنینی VIP 
+        async function initApp() {
+            const user = tg.initDataUnsafe?.user;
+            if (!user) {
+                fetchPrices(); // بۆ کاتی دیبەگ لە دەرەوەی تەلەگرام
+                return;
+            }
+            try {
+                const verifyResponse = await fetch(`${apiUrl}/api/verify/${user.id}`);
+                const verifyData = await verifyResponse.json();
+                if (verifyData.is_vip) {
+                    fetchPrices();
+                    setInterval(fetchPrices, 10000); // نوێبوونەوە هەموو ١٠ چرکەیەک
+                } else {
+                    document.body.innerHTML = `<div class="flex h-screen items-center justify-center text-center px-4"><div class="bg-[#1c1c1e] p-6 rounded-xl w-full border border-[#2c2c2e]"><h2 class="text-xl font-bold text-[#ff453a] mb-2">ڕێگەپێنەدراو</h2><p class="text-[#8e8e93] text-sm mb-4">پێویستە ئەندامی کەناڵی KurdChain بیت بۆ بینینی نرخەکان.</p><button onclick="tg.close()" class="bg-[#0a84ff] text-white w-full py-3 rounded-lg font-semibold">داخستن</button></div></div>`;
+                }
+            } catch(e) {
+                fetchPrices();
+            }
+        }
+
+        initApp();
     </script>
 </body>
 </html>
