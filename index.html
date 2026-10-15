@@ -16,26 +16,24 @@
         }
         .header-bg { background-color: #ffffff; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; }
         
-        /* Grid و List بۆ داشبۆرد */
         .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
-        .price-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px 5px; text-align: center; }
+        .price-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px 5px; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .card-val { font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 4px; direction: ltr; }
-        .card-name { font-size: 12px; color: #6b7280; }
-        .list-container { background-color: #ffffff; border-radius: 12px; margin: 0 15px 15px 15px; border: 1px solid #e5e7eb; }
+        .card-name { font-size: 11px; color: #6b7280; display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .arrow-up { color: #10b981; font-size: 10px; }
+        
+        .list-container { background-color: #ffffff; border-radius: 12px; margin: 0 15px 15px 15px; overflow: hidden; border: 1px solid #e5e7eb; }
         .list-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; border-bottom: 1px solid #e5e7eb; }
         .list-item:last-child { border-bottom: none; }
 
-        /* تابی سەرەوە */
         .tab-btn { color: #6b7280; border-bottom: 2px solid transparent; transition: all 0.2s ease; padding-bottom: 8px; font-size: 14px; }
         .tab-btn.active { color: #2563eb; border-bottom: 2px solid #2563eb; font-weight: 600; }
 
-        /* مینیوی خوارەوە */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-around; padding: 10px 0; z-index: 50; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #9ca3af; font-size: 11px; font-weight: 600; gap: 4px; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #9ca3af; font-size: 11px; font-weight: 600; gap: 4px; cursor: pointer; }
         .nav-item.active { color: #2563eb; }
         .nav-icon { font-size: 20px; }
 
-        /* ستایلی حاسیبە */
         .calc-box { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; display: flex; justify-content: space-between; align-items: center; margin: 0 15px; }
         .calc-box.result-box { background: #e6f0ff; border-color: #bfdbfe; }
         .asset-selector { display: flex; align-items: center; gap: 8px; background: #f3f4f6; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; }
@@ -47,7 +45,6 @@
         .key-action { background: #fee2e2; color: #ef4444; border-color: #fca5a5; }
         .key-swap { background: #dbeafe; color: #2563eb; border-color: #bfdbfe; }
 
-        /* مۆدێلی هەڵبژاردن (Bottom Sheet) */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .bottom-sheet { position: absolute; bottom: -100%; left: 0; right: 0; background: #ffffff; border-radius: 20px 20px 0 0; padding: 20px; transition: bottom 0.3s; max-height: 80vh; overflow-y: auto; }
@@ -59,7 +56,7 @@
     <div id="loading" class="flex h-screen items-center justify-center">
         <div class="text-center">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
-            <p class="text-sm text-gray-500">نوێکردنەوەی نرخەکان...</p>
+            <p class="text-sm text-gray-500">خەریکی سەلماندن و هێنانی نرخەکان...</p>
         </div>
     </div>
 
@@ -85,9 +82,19 @@
             </div>
         </div>
 
-        <div id="content-currencies"><div class="grid-container" id="grid-cities"></div><div class="list-container" id="list-other-currencies"></div></div>
-        <div id="content-metals" class="hidden"><div class="grid-container" id="grid-metals-top"></div><div class="list-container" id="list-metals"></div></div>
-        <div id="content-crypto" class="hidden"><div class="list-container mt-4" id="list-crypto"></div></div>
+        <div id="content-currencies">
+            <div class="grid-container" id="grid-cities"></div>
+            <div class="list-container" id="list-other-currencies"></div>
+        </div>
+        
+        <div id="content-metals" class="hidden">
+            <div class="grid-container" id="grid-metals-top"></div>
+            <div class="list-container" id="list-metals"></div>
+        </div>
+        
+        <div id="content-crypto" class="hidden">
+            <div class="list-container mt-4" id="list-crypto"></div>
+        </div>
     </div>
 
     <!-- پەڕەی حاسیبە -->
@@ -103,7 +110,7 @@
             </div>
             
             <div class="flex justify-center my-[-10px] z-10 relative">
-                <div onclick="swapAssets()" class="bg-blue-100 text-blue-600 w-10 h-10 rounded-full flex items-center justify-center border-4 border-gray-50 cursor-pointer shadow-sm">⇅</div>
+                <div onclick="swapAssets()" class="bg-blue-100 text-blue-600 w-10 h-10 rounded-full flex items-center justify-center border-4 border-white cursor-pointer shadow-sm">⇅</div>
             </div>
 
             <div class="calc-box result-box">
@@ -114,7 +121,7 @@
             </div>
         </div>
 
-        <!-- کیبۆردی تایبەت -->
+        <!-- کیبۆرد -->
         <div class="keypad mt-auto">
             <div class="key" onclick="keyPress('7')">7</div>
             <div class="key" onclick="keyPress('8')">8</div>
@@ -145,7 +152,7 @@
         </div>
     </div>
 
-    <!-- Bottom Sheet بۆ هەڵبژاردن -->
+    <!-- Bottom Sheet -->
     <div class="modal-overlay" id="asset-modal" onclick="closeModal(event)">
         <div class="bottom-sheet" onclick="event.stopPropagation()">
             <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
@@ -159,10 +166,10 @@
         tg.expand();
         tg.ready();
 
+        // بەستەری دروستی سێرڤەرەکە
         const apiUrl = "https://kurdchain-miniapp-api-production.up.railway.app";
         let apiData = null;
         
-        // گۆڕاوەکانی حاسیبە
         let calcVal = "0";
         let fromAsset = "usd";
         let toAsset = "iqd";
@@ -192,23 +199,46 @@
             document.getElementById(`content-${tabName}`).classList.remove('hidden');
         }
 
-        // دروستکردنی کارتی داشبۆرد
         function generateGridCards(items) {
             if (!items) return '';
-            return items.map(item => `<div class="price-card"><div class="card-val">${item.price}</div><div class="card-name"><span>${item.name}</span> <span class="text-green-500 text-[10px]">↑</span></div></div>`).join('');
+            return items.map(item => `
+                <div class="price-card">
+                    <div class="card-val">${item.price}</div>
+                    <div class="card-name">
+                        <span>${item.name}</span>
+                        <span class="arrow-up">↑</span>
+                    </div>
+                </div>
+            `).join('');
         }
-        function generateListRows(items) {
+        
+        function generateListRows(items, sourceText = "") {
             if (!items) return '';
-            return items.map(item => `<div class="list-item"><div class="flex items-center gap-3"><span class="text-xl">${item.icon}</span><div><div class="font-bold text-sm">${item.name}</div><div class="text-[10px] text-gray-500">${item.desc}</div></div></div><div class="font-bold text-[15px] dir-ltr">${item.price}</div></div>`).join('');
+            let html = items.map(item => `
+                <div class="list-item">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">${item.icon}</span>
+                        <div>
+                            <div class="font-bold text-sm">${item.name}</div>
+                            <div class="text-[10px] text-gray-500">${item.desc}</div>
+                        </div>
+                    </div>
+                    <div class="font-bold text-[15px] direction-ltr">${item.price}</div>
+                </div>
+            `).join('');
+            
+            if (sourceText) {
+                html += `<div class="p-3 text-center text-[10px] text-gray-400 bg-gray-50 border-t border-gray-100">${sourceText}</div>`;
+            }
+            return html;
         }
 
-        // کۆدەکانی حاسیبە
+        // Calculator functions
         function keyPress(key) {
             if (key === 'C') calcVal = "0";
             else if (key === 'DEL') calcVal = calcVal.length > 1 ? calcVal.slice(0, -1) : "0";
             else if (key === '.') { if (!calcVal.includes('.')) calcVal += '.'; }
             else { calcVal = calcVal === "0" ? key : calcVal + key; }
-            
             updateCalcDisplay();
         }
 
@@ -220,25 +250,28 @@
         }
 
         function updateCalcUI() {
-            if(!apiData) return;
+            if(!apiData || !apiData.calculator) return;
             const fromObj = apiData.calculator.find(a => a.id === fromAsset);
             const toObj = apiData.calculator.find(a => a.id === toAsset);
             
-            document.getElementById('from-icon').innerText = fromObj.icon;
-            document.getElementById('from-name').innerText = fromObj.id.toUpperCase().split('_')[0];
-            document.getElementById('to-icon').innerText = toObj.icon;
-            document.getElementById('to-name').innerText = toObj.id.toUpperCase().split('_')[0];
-            
+            if(fromObj && toObj) {
+                document.getElementById('from-icon').innerText = fromObj.icon;
+                document.getElementById('from-name').innerText = fromObj.id.toUpperCase().split('_')[0];
+                document.getElementById('to-icon').innerText = toObj.icon;
+                document.getElementById('to-name').innerText = toObj.id.toUpperCase().split('_')[0];
+            }
             updateCalcDisplay();
         }
 
         function updateCalcDisplay() {
             document.getElementById('calc-input').value = formatNumber(calcVal);
+            if(!apiData || !apiData.calculator) return;
             
-            if(!apiData) return;
             const fromObj = apiData.calculator.find(a => a.id === fromAsset);
             const toObj = apiData.calculator.find(a => a.id === toAsset);
             
+            if(!fromObj || !toObj) return;
+
             const rawVal = parseFloat(calcVal) || 0;
             const valInUSD = rawVal * fromObj.rate_to_usd;
             const finalVal = valInUSD / toObj.rate_to_usd;
@@ -252,8 +285,8 @@
             return parts.join('.');
         }
 
-        // Bottom Sheet Logic
         function openAssetModal(target) {
+            if(!apiData || !apiData.calculator) return;
             selectingFor = target;
             const listHtml = apiData.calculator.map(item => `
                 <div class="list-item cursor-pointer hover:bg-gray-50" onclick="selectAsset('${item.id}')">
@@ -278,20 +311,23 @@
         async function fetchPrices() {
             try {
                 const res = await fetch(`${apiUrl}/api/prices`);
-                if (!res.ok) return;
+                if (!res.ok) throw new Error("Network response was not ok");
+                
                 apiData = await res.json();
                 
-                // پڕکردنەوەی داشبۆرد
-                const dash = apiData.dashboard;
-                document.getElementById('grid-cities').innerHTML = generateGridCards(dash.currencies.slice(0, 6));
-                document.getElementById('list-other-currencies').innerHTML = generateListRows(dash.currencies.slice(6));
-                
-                document.getElementById('grid-metals-top').innerHTML = generateGridCards(dash.metals.slice(1, 4));
-                document.getElementById('list-metals').innerHTML = generateListRows([dash.metals[0], ...dash.metals.slice(4)]);
-                
-                document.getElementById('list-crypto').innerHTML = generateListRows(dash.crypto);
+                if (apiData.dashboard) {
+                    const dash = apiData.dashboard;
+                    
+                    document.getElementById('grid-cities').innerHTML = generateGridCards(dash.currencies.slice(0, 6));
+                    document.getElementById('list-other-currencies').innerHTML = generateListRows(dash.currencies.slice(6), "سەرچاوە: کاک هاوکار • 07701570694");
+                    
+                    document.getElementById('grid-metals-top').innerHTML = generateGridCards(dash.metals.slice(1, 4));
+                    document.getElementById('list-metals').innerHTML = generateListRows([dash.metals[0], ...dash.metals.slice(4)], "سەرچاوە: کاک کاردۆ • 07705045485");
+                    
+                    document.getElementById('list-crypto').innerHTML = generateListRows(dash.crypto, "KURDCHAIN TERMINAL");
+                }
 
-                updateCalcUI(); // نوێکردنەوەی داتای حاسیبە
+                updateCalcUI();
 
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('view-dashboard').classList.remove('hidden');
@@ -303,17 +339,23 @@
 
         async function initApp() {
             const user = tg.initDataUnsafe?.user;
-            if (!user) { fetchPrices(); return; }
+            if (!user) {
+                fetchPrices(); 
+                return;
+            }
             try {
                 const verifyResponse = await fetch(`${apiUrl}/api/verify/${user.id}`);
                 const verifyData = await verifyResponse.json();
+                
                 if (verifyData.is_vip) {
                     fetchPrices();
                     setInterval(fetchPrices, 10000); 
                 } else {
-                    document.body.innerHTML = `<div class="flex h-screen items-center justify-center text-center px-4"><div class="bg-white p-6 rounded-xl shadow-lg w-full"><h2 class="text-xl font-bold text-red-500 mb-2">ڕێگەپێنەدراو</h2><button onclick="tg.close()" class="bg-blue-600 text-white w-full py-3 rounded-lg mt-4 font-semibold">داخستن</button></div></div>`;
+                    document.body.innerHTML = `<div class="flex h-screen items-center justify-center text-center px-4"><div class="bg-white p-6 rounded-xl shadow-lg w-full"><h2 class="text-xl font-bold text-red-500 mb-2">ڕێگەپێنەدراو</h2><p class="text-gray-500 text-sm mb-4">پێویستە ئەندامی کەناڵی KurdChain بیت.</p><button onclick="tg.close()" class="bg-blue-600 text-white w-full py-3 rounded-lg font-semibold">داخستن</button></div></div>`;
                 }
-            } catch(e) { fetchPrices(); }
+            } catch(e) {
+                fetchPrices();
+            }
         }
 
         initApp();
