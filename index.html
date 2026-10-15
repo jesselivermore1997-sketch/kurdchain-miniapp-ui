@@ -7,7 +7,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* ڕەنگە بنەڕەتییەکان بە شێوازی iOS */
         :root {
             --ios-blue: #007AFF;
             --ios-bg: #F2F2F7;
@@ -31,7 +30,6 @@
             border-bottom: 0.5px solid rgba(60, 60, 67, 0.1);
         }
         
-        /* سکڕۆڵی تابەکان بە جوانی */
         .tabs-wrapper {
             display: flex;
             overflow-x: auto;
@@ -56,7 +54,6 @@
             font-weight: 600; 
         }
 
-        /* کارتەکانی Grid */
         .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 16px; }
         .price-card { 
             background-color: var(--ios-card); 
@@ -71,7 +68,6 @@
         .card-name { font-size: 12px; color: var(--ios-gray); font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 4px; }
         .arrow-up { color: #34C759; font-size: 11px; font-weight: bold; }
         
-        /* لیستی درێژ */
         .list-container { 
             background-color: var(--ios-card); 
             border-radius: 16px; 
@@ -93,7 +89,6 @@
             font-size: 20px;
         }
 
-        /* مینیوی خوارەوە بە شێوازی شوشەیی (Glassmorphism) */
         .bottom-nav { 
             position: fixed; bottom: 0; left: 0; right: 0; 
             background: rgba(255, 255, 255, 0.85); 
@@ -107,7 +102,6 @@
         .nav-item.active { color: var(--ios-blue); }
         .nav-icon { font-size: 22px; }
 
-        /* حاسیبە بە شێوازی iOS */
         .calc-box { background: var(--ios-card); border-radius: 16px; padding: 18px; display: flex; justify-content: space-between; align-items: center; margin: 0 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         .calc-box.result-box { background: #F0F8FF; }
         .asset-selector { display: flex; align-items: center; gap: 6px; background: #F2F2F7; padding: 8px 14px; border-radius: 20px; font-size: 15px; font-weight: 600; cursor: pointer; }
@@ -128,7 +122,6 @@
         .key-swap { background: var(--ios-blue); color: white; }
         .key-swap:active { background: #0056B3; }
 
-        /* مۆدێلی هەڵبژاردن بە شێوەی ڕاکێشانی خوارەوە */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .bottom-sheet { position: absolute; bottom: -100%; left: 0; right: 0; background: var(--ios-bg); border-radius: 24px 24px 0 0; padding: 20px 0; transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1); max-height: 85vh; display: flex; flex-direction: column; }
@@ -140,7 +133,6 @@
 </head>
 <body>
 
-    <!-- لۆدینگێکی جوانتر -->
     <div id="loading" class="flex h-screen items-center justify-center bg-[#F2F2F7] z-50 fixed inset-0">
         <div class="text-center">
             <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#007AFF] mx-auto mb-4"></div>
@@ -153,7 +145,10 @@
         <div class="header-bg sticky top-0 z-10">
             <div class="flex justify-between items-center px-4 py-4">
                 <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 bg-[#007AFF] text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-sm">K</div>
+                    <!-- لۆگۆکە لێرەدا جێگیر کراوە -->
+                    <div class="w-10 h-10 rounded-xl overflow-hidden shadow-sm border border-gray-100 flex items-center justify-center bg-white">
+                        <img src="logo.jpg" alt="KurdChain Logo" class="w-full h-full object-contain">
+                    </div>
                     <div>
                         <h1 class="text-[17px] font-bold tracking-tight">KurdChain Terminal</h1>
                         <p class="text-[11px] text-[#34C759] flex items-center gap-1.5 mt-0.5 font-medium">
