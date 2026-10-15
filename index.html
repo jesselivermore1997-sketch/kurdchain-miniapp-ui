@@ -7,121 +7,229 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* ڕەنگە بنەڕەتییەکان بە شێوازی iOS */
+        :root {
+            --ios-blue: #007AFF;
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-text: #000000;
+            --ios-gray: #8E8E93;
+            --ios-light-gray: #E5E5EA;
+        }
+
         body {
-            background-color: #f3f4f6;
-            color: #111827;
+            background-color: var(--ios-bg);
+            color: var(--ios-text);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             -webkit-font-smoothing: antialiased;
             -webkit-tap-highlight-color: transparent;
         }
-        .header-bg { background-color: #ffffff; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; }
         
-        .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
-        .price-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px 5px; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .card-val { font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 4px; direction: ltr; }
-        .card-name { font-size: 11px; color: #6b7280; display: flex; align-items: center; justify-content: center; gap: 4px; }
-        .arrow-up { color: #10b981; font-size: 10px; }
+        .header-bg { 
+            background-color: var(--ios-card); 
+            padding-bottom: 5px; 
+            border-bottom: 0.5px solid rgba(60, 60, 67, 0.1);
+        }
         
-        .list-container { background-color: #ffffff; border-radius: 12px; margin: 0 15px 15px 15px; overflow: hidden; border: 1px solid #e5e7eb; }
-        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; border-bottom: 1px solid #e5e7eb; }
+        /* سکڕۆڵی تابەکان بە جوانی */
+        .tabs-wrapper {
+            display: flex;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 0 16px;
+            gap: 24px;
+        }
+        .tabs-wrapper::-webkit-scrollbar { display: none; }
+        
+        .tab-btn {
+            color: var(--ios-gray);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            padding-bottom: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .tab-btn.active { 
+            color: var(--ios-blue); 
+            border-bottom: 3px solid var(--ios-blue); 
+            font-weight: 600; 
+        }
+
+        /* کارتەکانی Grid */
+        .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 16px; }
+        .price-card { 
+            background-color: var(--ios-card); 
+            border-radius: 16px; 
+            padding: 16px 8px; 
+            text-align: center; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); 
+            transition: transform 0.1s;
+        }
+        .price-card:active { transform: scale(0.96); }
+        .card-val { font-size: 17px; font-weight: 700; color: var(--ios-text); margin-bottom: 6px; direction: ltr; }
+        .card-name { font-size: 12px; color: var(--ios-gray); font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .arrow-up { color: #34C759; font-size: 11px; font-weight: bold; }
+        
+        /* لیستی درێژ */
+        .list-container { 
+            background-color: var(--ios-card); 
+            border-radius: 16px; 
+            margin: 0 16px 16px 16px; 
+            overflow: hidden; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .list-item { 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 14px 16px; 
+            border-bottom: 0.5px solid rgba(60, 60, 67, 0.1); 
+        }
         .list-item:last-child { border-bottom: none; }
+        .icon-circle {
+            width: 40px; height: 40px; 
+            background-color: #F2F2F7; 
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 20px;
+        }
 
-        .tab-btn { color: #6b7280; border-bottom: 2px solid transparent; transition: all 0.2s ease; padding-bottom: 8px; font-size: 14px; }
-        .tab-btn.active { color: #2563eb; border-bottom: 2px solid #2563eb; font-weight: 600; }
+        /* مینیوی خوارەوە بە شێوازی شوشەیی (Glassmorphism) */
+        .bottom-nav { 
+            position: fixed; bottom: 0; left: 0; right: 0; 
+            background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-top: 0.5px solid rgba(60, 60, 67, 0.1); 
+            display: flex; justify-content: space-around; 
+            padding: 12px 0 20px 0; z-index: 50; 
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--ios-gray); font-size: 10px; font-weight: 600; gap: 4px; cursor: pointer; transition: color 0.2s;}
+        .nav-item.active { color: var(--ios-blue); }
+        .nav-icon { font-size: 22px; }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-around; padding: 10px 0; z-index: 50; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #9ca3af; font-size: 11px; font-weight: 600; gap: 4px; cursor: pointer; }
-        .nav-item.active { color: #2563eb; }
-        .nav-icon { font-size: 20px; }
-
-        .calc-box { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; display: flex; justify-content: space-between; align-items: center; margin: 0 15px; }
-        .calc-box.result-box { background: #e6f0ff; border-color: #bfdbfe; }
-        .asset-selector { display: flex; align-items: center; gap: 8px; background: #f3f4f6; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; }
-        .calc-input { font-size: 24px; font-weight: 700; background: transparent; border: none; outline: none; width: 60%; direction: ltr; text-align: left; }
+        /* حاسیبە بە شێوازی iOS */
+        .calc-box { background: var(--ios-card); border-radius: 16px; padding: 18px; display: flex; justify-content: space-between; align-items: center; margin: 0 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .calc-box.result-box { background: #F0F8FF; }
+        .asset-selector { display: flex; align-items: center; gap: 6px; background: #F2F2F7; padding: 8px 14px; border-radius: 20px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .calc-input { font-size: 28px; font-weight: 700; background: transparent; border: none; outline: none; width: 60%; direction: ltr; text-align: left; }
         
-        .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 15px; margin-top: auto; }
-        .key { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; height: 56px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 500; cursor: pointer; }
-        .key:active { background: #f3f4f6; }
-        .key-action { background: #fee2e2; color: #ef4444; border-color: #fca5a5; }
-        .key-swap { background: #dbeafe; color: #2563eb; border-color: #bfdbfe; }
+        .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 20px 16px; margin-top: auto; }
+        .key { 
+            background: #E5E5EA; 
+            border-radius: 16px; 
+            height: 60px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 24px; font-weight: 500; 
+            cursor: pointer; transition: background 0.1s;
+        }
+        .key:active { background: #D1D1D6; }
+        .key-action { background: #FF3B30; color: white; }
+        .key-action:active { background: #D70015; }
+        .key-swap { background: var(--ios-blue); color: white; }
+        .key-swap:active { background: #0056B3; }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        /* مۆدێلی هەڵبژاردن بە شێوەی ڕاکێشانی خوارەوە */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        .bottom-sheet { position: absolute; bottom: -100%; left: 0; right: 0; background: #ffffff; border-radius: 20px 20px 0 0; padding: 20px; transition: bottom 0.3s; max-height: 80vh; overflow-y: auto; }
+        .bottom-sheet { position: absolute; bottom: -100%; left: 0; right: 0; background: var(--ios-bg); border-radius: 24px 24px 0 0; padding: 20px 0; transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1); max-height: 85vh; display: flex; flex-direction: column; }
         .modal-overlay.active .bottom-sheet { bottom: 0; }
+        .sheet-handle { width: 40px; height: 5px; background: #C7C7CC; border-radius: 3px; margin: 0 auto 15px auto; }
+        
+        .source-footer { padding: 12px; text-align: center; font-size: 11px; color: var(--ios-gray); background: transparent; }
     </style>
 </head>
 <body>
 
-    <div id="loading" class="flex h-screen items-center justify-center">
+    <!-- لۆدینگێکی جوانتر -->
+    <div id="loading" class="flex h-screen items-center justify-center bg-[#F2F2F7] z-50 fixed inset-0">
         <div class="text-center">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
-            <p class="text-sm text-gray-500">خەریکی سەلماندن و هێنانی نرخەکان...</p>
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#007AFF] mx-auto mb-4"></div>
+            <p class="text-[13px] text-[#8E8E93] font-medium">نوێکردنەوەی داتاکان...</p>
         </div>
     </div>
 
     <!-- داشبۆردی سەرەکی -->
-    <div id="view-dashboard" class="hidden pb-20">
+    <div id="view-dashboard" class="hidden pb-24">
         <div class="header-bg sticky top-0 z-10">
-            <div class="flex justify-between items-center px-4 py-3">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold">K</div>
-                    <h1 class="text-lg font-bold text-blue-600">KURDCHAIN</h1>
+            <div class="flex justify-between items-center px-4 py-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-[#007AFF] text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-sm">K</div>
+                    <div>
+                        <h1 class="text-[17px] font-bold tracking-tight">KurdChain Terminal</h1>
+                        <p class="text-[11px] text-[#34C759] flex items-center gap-1.5 mt-0.5 font-medium">
+                            <span class="relative flex h-2 w-2">
+                              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#34C759] opacity-75"></span>
+                              <span class="relative inline-flex rounded-full h-2 w-2 bg-[#34C759]"></span>
+                            </span> ڕاستەوخۆ
+                        </p>
+                    </div>
                 </div>
-                <div class="text-xs text-gray-500 flex flex-col items-end">
-                    <span class="flex items-center gap-1 text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded">
-                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> ڕاستەوخۆ
-                    </span>
-                    <span id="clock" class="mt-1">--:--</span>
-                </div>
+                <div class="text-[12px] text-[#8E8E93] font-medium bg-[#F2F2F7] px-3 py-1.5 rounded-full" id="clock">--:--</div>
             </div>
-            <div class="flex px-4 mt-2">
-                <button onclick="switchTab('currencies')" id="tab-currencies" class="tab-btn active flex-1">دراوەکان</button>
-                <button onclick="switchTab('metals')" id="tab-metals" class="tab-btn flex-1">زێڕ و زیوو</button>
-                <button onclick="switchTab('crypto')" id="tab-crypto" class="tab-btn flex-1">کریپتۆ</button>
+            
+            <div class="tabs-wrapper mt-1">
+                <button onclick="switchTab('dinar')" id="tab-dinar" class="tab-btn active">دینار</button>
+                <button onclick="switchTab('toman')" id="tab-toman" class="tab-btn">تومان</button>
+                <button onclick="switchTab('foreign')" id="tab-foreign" class="tab-btn">بیانی</button>
+                <button onclick="switchTab('gold')" id="tab-gold" class="tab-btn">زێڕ</button>
+                <button onclick="switchTab('silver')" id="tab-silver" class="tab-btn">زیو</button>
+                <button onclick="switchTab('crypto')" id="tab-crypto" class="tab-btn">کریپتۆ</button>
             </div>
         </div>
 
-        <div id="content-currencies">
-            <div class="grid-container" id="grid-cities"></div>
-            <div class="list-container" id="list-other-currencies"></div>
+        <div id="content-dinar">
+            <div class="grid-container" id="grid-dinar"></div>
+            <div class="source-footer">سەرچاوە: کاک هاوکار • 07701570694</div>
         </div>
         
-        <div id="content-metals" class="hidden">
-            <div class="grid-container" id="grid-metals-top"></div>
-            <div class="list-container" id="list-metals"></div>
+        <div id="content-toman" class="hidden">
+            <div class="grid-container" id="grid-toman"></div>
+        </div>
+
+        <div id="content-foreign" class="hidden">
+            <div class="list-container mt-4" id="list-foreign"></div>
+        </div>
+
+        <div id="content-gold" class="hidden">
+            <div class="grid-container" id="grid-gold"></div>
+            <div class="list-container" id="list-gold"></div>
+            <div class="source-footer -mt-2">سەرچاوە: کاک کاردۆ • 07705045485</div>
+        </div>
+
+        <div id="content-silver" class="hidden">
+            <div class="list-container mt-4" id="list-silver"></div>
         </div>
         
         <div id="content-crypto" class="hidden">
             <div class="list-container mt-4" id="list-crypto"></div>
+            <div class="source-footer -mt-2">KurdChain Terminal API</div>
         </div>
     </div>
 
     <!-- پەڕەی حاسیبە -->
-    <div id="view-calculator" class="hidden pb-24 h-screen flex flex-col bg-gray-50">
-        <div class="p-4 text-center font-bold text-gray-700 bg-white border-b">ئاڵوگۆڕ و حاسیبە</div>
+    <div id="view-calculator" class="hidden pb-24 h-screen flex flex-col">
+        <div class="p-4 text-center font-bold text-[17px] bg-white border-b border-gray-100">ئاڵوگۆڕکەر</div>
         
         <div class="mt-6">
             <div class="calc-box">
-                <input type="text" id="calc-input" class="calc-input text-gray-800" value="0" readonly>
+                <input type="text" id="calc-input" class="calc-input text-[#000000]" value="0" readonly>
                 <div class="asset-selector" onclick="openAssetModal('from')">
-                    <span id="from-icon">🇺🇸</span> <span id="from-name">USD</span> <span>▼</span>
+                    <span id="from-icon">🇺🇸</span> <span id="from-name">USD</span> 
                 </div>
             </div>
             
-            <div class="flex justify-center my-[-10px] z-10 relative">
-                <div onclick="swapAssets()" class="bg-blue-100 text-blue-600 w-10 h-10 rounded-full flex items-center justify-center border-4 border-white cursor-pointer shadow-sm">⇅</div>
+            <div class="flex justify-center my-[-14px] z-10 relative">
+                <div onclick="swapAssets()" class="bg-white text-[#007AFF] w-12 h-12 rounded-full flex items-center justify-center border border-gray-100 cursor-pointer shadow-md text-xl transition-transform active:scale-90">⇅</div>
             </div>
 
             <div class="calc-box result-box">
-                <input type="text" id="calc-output" class="calc-input text-blue-800" value="0" readonly>
-                <div class="asset-selector bg-blue-200 text-blue-800" onclick="openAssetModal('to')">
-                    <span id="to-icon">🇮🇶</span> <span id="to-name">IQD</span> <span>▼</span>
+                <input type="text" id="calc-output" class="calc-input text-[#007AFF]" value="0" readonly>
+                <div class="asset-selector bg-[#E5F1FF] text-[#007AFF]" onclick="openAssetModal('to')">
+                    <span id="to-icon">🇮🇶</span> <span id="to-name">IQD</span> 
                 </div>
             </div>
         </div>
 
-        <!-- کیبۆرد -->
         <div class="keypad mt-auto">
             <div class="key" onclick="keyPress('7')">7</div>
             <div class="key" onclick="keyPress('8')">8</div>
@@ -130,7 +238,7 @@
             <div class="key" onclick="keyPress('4')">4</div>
             <div class="key" onclick="keyPress('5')">5</div>
             <div class="key" onclick="keyPress('6')">6</div>
-            <div class="key key-action" onclick="keyPress('C')">C</div>
+            <div class="key" onclick="keyPress('C')">C</div>
             <div class="key" onclick="keyPress('1')">1</div>
             <div class="key" onclick="keyPress('2')">2</div>
             <div class="key" onclick="keyPress('3')">3</div>
@@ -145,19 +253,19 @@
     <!-- مینیوی خوارەوە -->
     <div class="bottom-nav">
         <div class="nav-item active" id="nav-dash" onclick="switchView('dashboard')">
-            <span class="nav-icon">📈</span><span>نرخەکان</span>
+            <span class="nav-icon">📊</span><span>بازاڕ</span>
         </div>
         <div class="nav-item" id="nav-calc" onclick="switchView('calculator')">
             <span class="nav-icon">💱</span><span>ئاڵوگۆڕ</span>
         </div>
     </div>
 
-    <!-- Bottom Sheet -->
+    <!-- Bottom Sheet بۆ دراوەکان -->
     <div class="modal-overlay" id="asset-modal" onclick="closeModal(event)">
         <div class="bottom-sheet" onclick="event.stopPropagation()">
-            <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
-            <h3 class="text-center font-bold mb-4">هەڵبژاردنی دراو یان کانزا</h3>
-            <div class="list-container mx-0" id="modal-asset-list"></div>
+            <div class="sheet-handle"></div>
+            <h3 class="text-center font-bold text-[17px] mb-4">هەڵبژاردن</h3>
+            <div class="list-container mx-4 overflow-y-auto" style="flex: 1; margin-bottom: 0;" id="modal-asset-list"></div>
         </div>
     </div>
 
@@ -166,7 +274,6 @@
         tg.expand();
         tg.ready();
 
-        // بەستەری دروستی سێرڤەرەکە
         const apiUrl = "https://kurdchain-miniapp-api-production.up.railway.app";
         let apiData = null;
         
@@ -191,12 +298,15 @@
         }
 
         function switchTab(tabName) {
-            ['currencies', 'metals', 'crypto'].forEach(t => {
+            const tabs = ['dinar', 'toman', 'foreign', 'gold', 'silver', 'crypto'];
+            tabs.forEach(t => {
                 document.getElementById(`tab-${t}`).classList.remove('active');
                 document.getElementById(`content-${t}`).classList.add('hidden');
             });
             document.getElementById(`tab-${tabName}`).classList.add('active');
             document.getElementById(`content-${tabName}`).classList.remove('hidden');
+            
+            document.getElementById(`tab-${tabName}`).scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         }
 
         function generateGridCards(items) {
@@ -212,28 +322,22 @@
             `).join('');
         }
         
-        function generateListRows(items, sourceText = "") {
+        function generateListRows(items) {
             if (!items) return '';
-            let html = items.map(item => `
+            return items.map(item => `
                 <div class="list-item">
                     <div class="flex items-center gap-3">
-                        <span class="text-xl">${item.icon}</span>
+                        <div class="icon-circle">${item.icon}</div>
                         <div>
-                            <div class="font-bold text-sm">${item.name}</div>
-                            <div class="text-[10px] text-gray-500">${item.desc}</div>
+                            <div class="font-bold text-[15px]">${item.name}</div>
+                            <div class="text-[11px] text-[#8E8E93] mt-0.5">${item.desc}</div>
                         </div>
                     </div>
-                    <div class="font-bold text-[15px] direction-ltr">${item.price}</div>
+                    <div class="font-bold text-[16px] direction-ltr">${item.price}</div>
                 </div>
             `).join('');
-            
-            if (sourceText) {
-                html += `<div class="p-3 text-center text-[10px] text-gray-400 bg-gray-50 border-t border-gray-100">${sourceText}</div>`;
-            }
-            return html;
         }
 
-        // Calculator functions
         function keyPress(key) {
             if (key === 'C') calcVal = "0";
             else if (key === 'DEL') calcVal = calcVal.length > 1 ? calcVal.slice(0, -1) : "0";
@@ -289,8 +393,11 @@
             if(!apiData || !apiData.calculator) return;
             selectingFor = target;
             const listHtml = apiData.calculator.map(item => `
-                <div class="list-item cursor-pointer hover:bg-gray-50" onclick="selectAsset('${item.id}')">
-                    <div class="flex items-center gap-3"><span class="text-xl">${item.icon}</span><span class="font-bold text-sm">${item.name}</span></div>
+                <div class="list-item cursor-pointer hover:bg-[#F2F2F7] transition-colors" onclick="selectAsset('${item.id}')">
+                    <div class="flex items-center gap-3">
+                        <div class="icon-circle" style="width: 32px; height: 32px; font-size: 16px;">${item.icon}</div>
+                        <span class="font-bold text-[14px]">${item.name}</span>
+                    </div>
                 </div>
             `).join('');
             document.getElementById('modal-asset-list').innerHTML = listHtml;
@@ -318,13 +425,21 @@
                 if (apiData.dashboard) {
                     const dash = apiData.dashboard;
                     
-                    document.getElementById('grid-cities').innerHTML = generateGridCards(dash.currencies.slice(0, 6));
-                    document.getElementById('list-other-currencies').innerHTML = generateListRows(dash.currencies.slice(6), "سەرچاوە: کاک هاوکار • 07701570694");
+                    const dinarItems = dash.currencies.slice(0, 6);
+                    const tomanItems = dash.currencies.slice(6, 8);
+                    const foreignItems = dash.currencies.slice(8);
+                    const goldItems = dash.metals.filter(m => !m.name.includes("زیوو"));
+                    const silverItems = dash.metals.filter(m => m.name.includes("زیوو"));
+
+                    document.getElementById('grid-dinar').innerHTML = generateGridCards(dinarItems);
+                    document.getElementById('grid-toman').innerHTML = generateGridCards(tomanItems);
+                    document.getElementById('list-foreign').innerHTML = generateListRows(foreignItems);
                     
-                    document.getElementById('grid-metals-top').innerHTML = generateGridCards(dash.metals.slice(1, 4));
-                    document.getElementById('list-metals').innerHTML = generateListRows([dash.metals[0], ...dash.metals.slice(4)], "سەرچاوە: کاک کاردۆ • 07705045485");
+                    document.getElementById('grid-gold').innerHTML = generateGridCards(goldItems.slice(0, 3));
+                    document.getElementById('list-gold').innerHTML = generateListRows(goldItems.slice(3));
                     
-                    document.getElementById('list-crypto').innerHTML = generateListRows(dash.crypto, "KURDCHAIN TERMINAL");
+                    document.getElementById('list-silver').innerHTML = generateListRows(silverItems);
+                    document.getElementById('list-crypto').innerHTML = generateListRows(dash.crypto);
                 }
 
                 updateCalcUI();
@@ -339,10 +454,7 @@
 
         async function initApp() {
             const user = tg.initDataUnsafe?.user;
-            if (!user) {
-                fetchPrices(); 
-                return;
-            }
+            if (!user) { fetchPrices(); return; }
             try {
                 const verifyResponse = await fetch(`${apiUrl}/api/verify/${user.id}`);
                 const verifyData = await verifyResponse.json();
@@ -351,11 +463,9 @@
                     fetchPrices();
                     setInterval(fetchPrices, 10000); 
                 } else {
-                    document.body.innerHTML = `<div class="flex h-screen items-center justify-center text-center px-4"><div class="bg-white p-6 rounded-xl shadow-lg w-full"><h2 class="text-xl font-bold text-red-500 mb-2">ڕێگەپێنەدراو</h2><p class="text-gray-500 text-sm mb-4">پێویستە ئەندامی کەناڵی KurdChain بیت.</p><button onclick="tg.close()" class="bg-blue-600 text-white w-full py-3 rounded-lg font-semibold">داخستن</button></div></div>`;
+                    document.body.innerHTML = `<div class="flex h-screen items-center justify-center text-center px-6 bg-[#F2F2F7]"><div class="bg-white p-8 rounded-2xl shadow-sm w-full"><div class="text-4xl mb-4">🔒</div><h2 class="text-xl font-bold text-[#111827] mb-2">تایبەت بە VIP</h2><p class="text-[#8E8E93] text-[14px] mb-6 leading-relaxed">ئەم خزمەتگوزارییە تەنها بۆ بەشداربووانی کەناڵی تایبەتی KurdChain بەردەستە.</p><button onclick="tg.close()" class="bg-[#007AFF] text-white w-full py-3.5 rounded-xl font-semibold active:bg-[#0056B3] transition-colors">داخستن</button></div></div>`;
                 }
-            } catch(e) {
-                fetchPrices();
-            }
+            } catch(e) { fetchPrices(); }
         }
 
         initApp();
