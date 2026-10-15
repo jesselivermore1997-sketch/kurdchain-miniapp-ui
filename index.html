@@ -39,25 +39,21 @@
         <h1 class="text-2xl font-bold mb-6 text-center text-yellow-400">نرخەکانی بازاڕی سلێمانی</h1>
         
         <div class="grid grid-cols-2 gap-4">
-            <!-- کارتی دۆلار -->
             <div class="card p-4 rounded-lg text-center shadow-lg border border-gray-600">
                 <p class="text-sm text-gray-300 mb-1">١٠٠ دۆلار</p>
                 <p class="text-xl font-bold text-green-400" id="price-usd">---</p>
             </div>
             
-            <!-- کارتی تمەن -->
             <div class="card p-4 rounded-lg text-center shadow-lg border border-gray-600">
                 <p class="text-sm text-gray-300 mb-1">١٠٠ دۆلار بە تمەن</p>
                 <p class="text-xl font-bold text-blue-400" id="price-toman">---</p>
             </div>
 
-            <!-- کارتی زێڕ -->
             <div class="card p-4 rounded-lg text-center shadow-lg border border-gray-600">
                 <p class="text-sm text-gray-300 mb-1">زێڕ عەیارە ٢١</p>
                 <p class="text-xl font-bold text-yellow-400" id="price-gold">---</p>
             </div>
 
-            <!-- کارتی یۆرۆ -->
             <div class="card p-4 rounded-lg text-center shadow-lg border border-gray-600">
                 <p class="text-sm text-gray-300 mb-1">١٠٠ یۆرۆ</p>
                 <p class="text-xl font-bold text-white" id="price-euro">---</p>
@@ -69,47 +65,46 @@
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand(); // بۆ ئەوەی ئەپەکە شاشەکە پڕ بکاتەوە
+        tg.expand();
         tg.ready();
 
-        // وەرگرتنی ئایدی بەکارهێنەر لە تەلەگرامەوە
         const user = tg.initDataUnsafe?.user;
         const apiUrl = "https://kurdchain-miniapp-api-production.up.railway.app";
 
         async function checkAccessAndLoadData() {
             if (!user) {
-                // ئەگەر لە دەرەوەی تەلەگرام کرایەوە
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('access-denied').classList.remove('hidden');
                 return;
             }
 
             try {
-                // ١. پشکنین بزانین بەکارهێنەرەکە لە کەناڵە تایبەتەکەدایە یان نا
                 const verifyResponse = await fetch(`${apiUrl}/api/verify/${user.id}`);
-                const verifyData = await verifyResponse.json();
+                
+                if (!verifyResponse.ok) {
+                    throw new Error(`Server status: ${verifyResponse.status}`);
+                }
 
+                const verifyData = await verifyResponse.json();
                 document.getElementById('loading').classList.add('hidden');
 
                 if (verifyData.is_vip) {
-                    // ٢. ئەگەر VIP بوو، نرخەکان بهێنە
                     document.getElementById('dashboard').classList.remove('hidden');
                     fetchPrices();
-                    // نوێکردنەوەی نرخەکان هەموو ١٠ چرکە جارێک
                     setInterval(fetchPrices, 10000); 
                 } else {
-                    // ٣. ئەگەر VIP نەبوو، ڕەتی بکەرەوە
                     document.getElementById('access-denied').classList.remove('hidden');
                 }
             } catch (error) {
                 console.error("Error:", error);
-                document.getElementById('loading').innerHTML = "<p class='text-red-500'>کێشەیەک لە هێڵی ئینتەرنێتەکەت هەیە</p>";
+                document.getElementById('loading').innerHTML = `<div class='mt-10'><h2 class='text-xl font-bold text-red-500'>کێشەیەک ڕوویدا</h2><p class='mt-4 text-gray-300' dir='ltr'>${error.message}</p></div>`;
             }
         }
 
         async function fetchPrices() {
             try {
                 const res = await fetch(`${apiUrl}/api/prices`);
+                if (!res.ok) return;
                 const data = await res.json();
                 
                 document.getElementById('price-usd').innerText = data.usd_iqd.toLocaleString() + " دینار";
@@ -117,11 +112,10 @@
                 document.getElementById('price-gold').innerText = data.gold_21_mithqal.toLocaleString() + " دینار";
                 document.getElementById('price-euro').innerText = data.euro.toLocaleString() + " دینار";
             } catch (error) {
-                console.error("Failed to fetch prices");
+                console.error("Failed to fetch prices:", error);
             }
         }
 
-        // دەستپێکردنی پڕۆسەکە
         checkAccessAndLoadData();
     </script>
 </body>
