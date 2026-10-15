@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KurdChain App</title>
+    <title>KurdChain Terminal</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            background-color: #000000; /* ڕەنگی ڕەشی ئای ئۆ ئێس */
+            background-color: #000000;
             color: #ffffff;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             -webkit-font-smoothing: antialiased;
@@ -23,7 +23,7 @@
             transition: all 0.2s ease;
         }
         .tab-btn.active {
-            color: #0a84ff; /* شینی ئای ئۆ ئێس */
+            color: #0a84ff;
             border-bottom: 2px solid #0a84ff;
         }
         .list-container {
@@ -42,9 +42,9 @@
             border-bottom: none;
         }
         .icon-box {
-            font-size: 24px;
-            width: 40px;
-            height: 40px;
+            font-size: 20px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -56,25 +56,17 @@
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            min-width: 80px;
+            min-width: 90px;
         }
         .price-val {
             font-weight: 600;
-            font-size: 15px;
+            font-size: 16px;
             direction: ltr;
         }
-        .price-label {
-            font-size: 11px;
-            color: #8e8e93;
-            margin-bottom: 2px;
-        }
-        .sell-color { color: #ff453a; } /* سووری کڕین/فرۆشتن */
-        .buy-color { color: #32d74b; } /* سەوزی کڕین/فرۆشتن */
     </style>
 </head>
 <body>
 
-    <!-- لۆدینگ -->
     <div id="loading" class="flex h-screen items-center justify-center">
         <div class="text-center">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0a84ff] mx-auto mb-3"></div>
@@ -82,39 +74,34 @@
         </div>
     </div>
 
-    <!-- داشبۆرد -->
     <div id="dashboard" class="hidden pb-10">
-        <!-- هێدەر -->
         <div class="header-bg sticky top-0 z-10">
             <div class="flex justify-between items-center px-4 py-3">
                 <div>
-                    <h1 class="text-xl font-bold">KurdChain</h1>
-                    <p class="text-xs text-[#32d74b] flex items-center gap-1">
+                    <h1 class="text-xl font-bold">KURDCHAIN TERMINAL</h1>
+                    <p class="text-xs text-[#32d74b] flex items-center gap-1 mt-1">
                         <span class="relative flex h-2 w-2">
                           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#32d74b] opacity-75"></span>
                           <span class="relative inline-flex rounded-full h-2 w-2 bg-[#32d74b]"></span>
                         </span>
-                        نرخەکان ڕاستەوخۆن
+                        ڕاستەوخۆ
                     </p>
                 </div>
-                <div class="text-sm text-gray-400" id="clock">--:--</div>
+                <div class="text-sm text-gray-400 text-left">
+                    <div id="clock">--:--</div>
+                    <div id="date" class="text-xs">--/--/----</div>
+                </div>
             </div>
 
-            <!-- تابەکان -->
             <div class="flex px-4 mt-2">
                 <button onclick="switchTab('currencies')" id="tab-currencies" class="tab-btn active flex-1 pb-2 text-sm font-medium">دراوەکان</button>
-                <button onclick="switchTab('metals')" id="tab-metals" class="tab-btn flex-1 pb-2 text-sm font-medium">زێڕ و زیو</button>
+                <button onclick="switchTab('metals')" id="tab-metals" class="tab-btn flex-1 pb-2 text-sm font-medium">زێڕ و زیوو</button>
                 <button onclick="switchTab('crypto')" id="tab-crypto" class="tab-btn flex-1 pb-2 text-sm font-medium">دیجیتاڵی</button>
             </div>
         </div>
 
-        <!-- لیستی دراوەکان -->
         <div id="content-currencies" class="list-container"></div>
-        
-        <!-- لیستی زێڕ -->
         <div id="content-metals" class="list-container hidden"></div>
-
-        <!-- لیستی کریپتۆ -->
         <div id="content-crypto" class="list-container hidden"></div>
     </div>
 
@@ -126,13 +113,12 @@
         const apiUrl = "https://kurdchain-miniapp-api-production.up.railway.app";
         let currentData = {};
 
-        // کاتژمێری سەرەوە
         setInterval(() => {
             const now = new Date();
             document.getElementById('clock').innerText = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+            document.getElementById('date').innerText = now.toISOString().split('T')[0];
         }, 1000);
 
-        // گۆڕینی تابەکان
         window.switchTab = function(tabName) {
             ['currencies', 'metals', 'crypto'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.remove('active');
@@ -142,41 +128,47 @@
             document.getElementById(`content-${tabName}`).classList.remove('hidden');
         };
 
-        // دروستکردنی کۆدی HTML بۆ هەر ڕیزێک
-        function generateListHTML(items) {
+        function generateListHTML(items, sourceText = "") {
             if (!items) return '';
-            return items.map(item => `
+            let html = items.map(item => `
                 <div class="list-item">
                     <div class="icon-box">${item.icon}</div>
                     <div class="flex-1 mr-3">
                         <div class="font-semibold text-[15px]">${item.name}</div>
                         <div class="text-xs text-[#8e8e93]">${item.desc}</div>
                     </div>
-                    <div class="flex gap-4">
-                        <div class="price-col">
-                            <span class="price-label">کڕین</span>
-                            <span class="price-val buy-color">${item.buy}</span>
-                        </div>
-                        <div class="price-col">
-                            <span class="price-label">فرۆشتن</span>
-                            <span class="price-val sell-color">${item.sell}</span>
-                        </div>
+                    <div class="price-col justify-center">
+                        <span class="price-val text-white">${item.price}</span>
                     </div>
                 </div>
             `).join('');
+
+            if (sourceText) {
+                html += `<div class="p-4 text-center text-[11px] text-[#8e8e93] bg-[#151516] border-t border-[#2c2c2e] leading-5">${sourceText}</div>`;
+            }
+            return html;
         }
 
         async function fetchPrices() {
             try {
-                // کاتی تاقیکردنەوە، دەتوانین ڕاستەوخۆ داتاکە بهێنین بێ سەلماندن ئەگەر بتەوێت زوو بیبینیت
                 const res = await fetch(`${apiUrl}/api/prices`);
                 if (!res.ok) return;
                 
                 currentData = await res.json();
                 
-                document.getElementById('content-currencies').innerHTML = generateListHTML(currentData.currencies);
-                document.getElementById('content-metals').innerHTML = generateListHTML(currentData.metals);
-                document.getElementById('content-crypto').innerHTML = generateListHTML(currentData.crypto);
+                // زیادکردنی سەرچاوەکان بۆ خوارەوەی هەر لیستێک
+                document.getElementById('content-currencies').innerHTML = generateListHTML(
+                    currentData.currencies, 
+                    "سەرچاوە: کاک هاوکار • بازاڕی دۆلاری کۆن<br>07701570694"
+                );
+                document.getElementById('content-metals').innerHTML = generateListHTML(
+                    currentData.metals, 
+                    "سەرچاوە نرخی ڕاستەوخۆی حەوزەکە<br>کاک کاردۆ • بازاڕی دۆلاری نوێ<br>07705045485"
+                );
+                document.getElementById('content-crypto').innerHTML = generateListHTML(
+                    currentData.crypto, 
+                    "سەرچاوە: KURDCHAIN TERMINAL"
+                );
 
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
@@ -186,11 +178,10 @@
             }
         }
 
-        // پشکنینی VIP 
         async function initApp() {
             const user = tg.initDataUnsafe?.user;
             if (!user) {
-                fetchPrices(); // بۆ کاتی دیبەگ لە دەرەوەی تەلەگرام
+                fetchPrices(); 
                 return;
             }
             try {
@@ -198,7 +189,7 @@
                 const verifyData = await verifyResponse.json();
                 if (verifyData.is_vip) {
                     fetchPrices();
-                    setInterval(fetchPrices, 10000); // نوێبوونەوە هەموو ١٠ چرکەیەک
+                    setInterval(fetchPrices, 10000); 
                 } else {
                     document.body.innerHTML = `<div class="flex h-screen items-center justify-center text-center px-4"><div class="bg-[#1c1c1e] p-6 rounded-xl w-full border border-[#2c2c2e]"><h2 class="text-xl font-bold text-[#ff453a] mb-2">ڕێگەپێنەدراو</h2><p class="text-[#8e8e93] text-sm mb-4">پێویستە ئەندامی کەناڵی KurdChain بیت بۆ بینینی نرخەکان.</p><button onclick="tg.close()" class="bg-[#0a84ff] text-white w-full py-3 rounded-lg font-semibold">داخستن</button></div></div>`;
                 }
